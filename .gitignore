@@ -1,0 +1,10 @@
+node_modules/
+dist/
+bun.lockb
+*.nes
+*.sav
+*.state*
+*.cht
+*.wav
+*.bmp
+*.png

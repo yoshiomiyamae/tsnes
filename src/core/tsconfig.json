@@ -1,0 +1,10 @@
+{
+  // コアはランタイム非依存（PLAN.md 第 2 章）。DOM も bun/node の型も入れないことで、
+  // `document` / `localStorage` / `Bun.file` などの混入を型検査で弾く。
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "types": []
+  },
+  "include": ["./**/*.ts"]
+}

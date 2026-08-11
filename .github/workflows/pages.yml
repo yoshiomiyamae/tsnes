@@ -1,0 +1,67 @@
+# GitHub Pages へ配布ビルドをデプロイする。
+#
+# 公開するのは dist/（index.html + main.js + audio-worklet.js）だけ。
+# ROM は一切リポジトリに入れないし、成果物にも含めない
+# （ROM テストは TSNES_TEST_ROMS が無い CI 環境では自動 skip される）。
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同時デプロイを 1 本に絞る（進行中のものは中断しない）。
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      # 型検査（ルート + コア専用プロジェクト）。
+      - run: bun run typecheck
+
+      # ユニットテスト。ROM ベースのものは ROM 不在で skip される。
+      - run: bun test
+
+      - run: bun run build
+
+      # dist に ROM や セーブデータが紛れていないことを確認してから公開する。
+      - name: Verify no ROM/save data in artifact
+        run: |
+          if find dist -type f \( -iname '*.nes' -o -iname '*.sav' -o -iname '*.cht' -o -iname '*.state*' \) | grep -q .; then
+            echo "::error::dist に ROM / セーブデータが含まれている"
+            exit 1
+          fi
+          echo "dist の中身:"
+          ls -la dist
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

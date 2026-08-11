@@ -1,0 +1,19 @@
+{
+  "name": "tsnes",
+  "version": "0.1.0",
+  "description": "NES emulator in TypeScript (port of ../cppnes), runs in the browser",
+  "type": "module",
+  "private": true,
+  "module": "src/core/index.ts",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p src/core",
+    "dev": "bun run tools/serve.ts",
+    "build": "bun run tools/build.ts",
+    "headless": "bun run tools/headless.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.6.0"
+  }
+}
