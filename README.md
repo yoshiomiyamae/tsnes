@@ -3,6 +3,9 @@
 `../cppnes`（C++23 製 NES エミュレータ。その先は Rust の `../rsnes` → Go の `../gones`）の
 **TypeScript 移植**。**ブラウザで動作**する。設計・移植方針は [PLAN.md](PLAN.md)。
 
+**▶ ブラウザで試す: https://yoshiomiyamae.github.io/tsnes/**
+（`.nes` を画面にドロップするだけ。ROM は同梱していないので手持ちのものを使って）
+
 cppnes を「正解」とし、同じユニットテスト・同じテスト ROM 群に加えて、
 **cppnes とのヘッドレス出力バイナリ差分**（フレームバッファ + サイクル数）で
 挙動の同一性を検証している。
@@ -47,6 +50,11 @@ bun run build   # dist/index.html + dist/main.js + dist/audio-worklet.js
 ```
 
 `dist/` をそのまま任意の静的ホスティングに置けば動く（サーバ側の処理は不要）。
+参照は全て相対パスなので、`https://example.com/tsnes/` のようなサブパス配信でもそのまま動く。
+
+`main` への push で GitHub Actions（`.github/workflows/pages.yml`）が
+型検査 → テスト → ビルドを回し、`dist/` を GitHub Pages へデプロイする。
+ROM やセーブデータが成果物に混ざっていないことをデプロイ前に検査している。
 
 ### RAM / レジスタビューア
 
